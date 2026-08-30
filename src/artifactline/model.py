@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from pathlib import Path
 
 
@@ -59,3 +60,31 @@ class Job:
 class Workflow:
     path: Path
     jobs: tuple[Job, ...]
+
+
+class Severity(StrEnum):
+    ERROR = "error"
+    WARNING = "warning"
+
+
+@dataclass(frozen=True, slots=True)
+class Finding:
+    rule_id: str
+    severity: Severity
+    message: str
+    location: SourceLocation
+    evidence: tuple[str, ...] = ()
+    related: tuple[SourceLocation, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class ArtifactFlow:
+    producer: Upload
+    consumer: Download
+
+
+@dataclass(frozen=True, slots=True)
+class Analysis:
+    workflow: Workflow
+    findings: tuple[Finding, ...]
+    flows: tuple[ArtifactFlow, ...]
