@@ -1,0 +1,49 @@
+name: Deliberately broken artifact handoffs
+
+on:
+  push:
+
+jobs:
+  matrix-build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.os }}
+          path: dist/*
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: dist/linux/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: workspace
+          path: .
+          include-hidden-files: true
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: dist/windows/*
+
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: release
+      - uses: actions/download-artifact@v5
+        with:
+          name: missing-signature
+      - uses: actions/download-artifact@v5
