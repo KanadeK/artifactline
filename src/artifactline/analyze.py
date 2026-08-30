@@ -254,10 +254,13 @@ def _transitive_needs(job: Job, jobs: dict[str, Job]) -> frozenset[str]:
 
 def _references_matrix_axis(template: str, axis: str) -> bool:
     escaped = re.escape(axis)
-    return re.search(
-        rf"matrix\s*(?:\.\s*{escaped}\b|\[\s*['\"]{escaped}['\"]\s*\])",
-        template,
-    ) is not None
+    return (
+        re.search(
+            rf"matrix\s*(?:\.\s*{escaped}\b|\[\s*['\"]{escaped}['\"]\s*\])",
+            template,
+        )
+        is not None
+    )
 
 
 def _has_expression(value: str) -> bool:
@@ -266,9 +269,7 @@ def _has_expression(value: str) -> bool:
 
 def _is_broad_path(value: str) -> bool:
     normalized = value.strip().replace("\\", "/").rstrip("/")
-    return normalized in {"", ".", "**", "**/*", "./**", "./**/*"} or normalized.startswith(
-        "**/"
-    )
+    return normalized in {"", ".", "**", "**/*", "./**", "./**/*"} or normalized.startswith("**/")
 
 
 def _ordered_unique_findings(findings: list[Finding]) -> tuple[Finding, ...]:

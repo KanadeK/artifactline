@@ -84,9 +84,7 @@ def test_strict_mode_promotes_warning_to_exit_one(tmp_path: Path) -> None:
     assert main(["audit", str(workflow), "--strict"]) == 1
 
 
-def test_json_report_is_deterministic_and_has_evidence(
-    tmp_path: Path, capsys, monkeypatch
-) -> None:  # type: ignore[no-untyped-def]
+def test_json_report_is_deterministic_and_has_evidence(tmp_path: Path, capsys, monkeypatch) -> None:  # type: ignore[no-untyped-def]
     workflow = write_workflow(tmp_path / "broken.yml", BROKEN)
     monkeypatch.chdir(tmp_path)
 
@@ -103,9 +101,7 @@ def test_json_report_is_deterministic_and_has_evidence(
     assert report["workflows"][0]["findings"][0]["location"]["line"] > 0
 
 
-def test_sarif_report_contains_rules_and_locations(
-    tmp_path: Path, capsys, monkeypatch
-) -> None:  # type: ignore[no-untyped-def]
+def test_sarif_report_contains_rules_and_locations(tmp_path: Path, capsys, monkeypatch) -> None:  # type: ignore[no-untyped-def]
     workflow = write_workflow(tmp_path / "broken.yml", BROKEN)
     monkeypatch.chdir(tmp_path)
 
@@ -115,18 +111,17 @@ def test_sarif_report_contains_rules_and_locations(
     run = report["runs"][0]
     assert report["version"] == "2.1.0"
     assert {result["ruleId"] for result in run["results"]} == {"AFL004", "AFL005"}
-    assert run["results"][0]["locations"][0]["physicalLocation"]["artifactLocation"][
-        "uri"
-    ] == "broken.yml"
+    assert (
+        run["results"][0]["locations"][0]["physicalLocation"]["artifactLocation"]["uri"]
+        == "broken.yml"
+    )
 
 
 def test_output_file_receives_report(tmp_path: Path, capsys) -> None:  # type: ignore[no-untyped-def]
     workflow = write_workflow(tmp_path / "ci.yml", HEALTHY)
     output_path = tmp_path / "report.json"
 
-    assert main(
-        ["audit", str(workflow), "--format", "json", "--output", str(output_path)]
-    ) == 0
+    assert main(["audit", str(workflow), "--format", "json", "--output", str(output_path)]) == 0
 
     assert json.loads(output_path.read_text(encoding="utf-8"))["summary"]["flows"] == 1
     assert "Wrote json report" in capsys.readouterr().out

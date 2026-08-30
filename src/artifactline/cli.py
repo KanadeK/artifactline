@@ -37,8 +37,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise AssertionError(f"unhandled command: {args.command}")
     try:
         analyses = tuple(
-            analyze_workflow(parse_workflow_file(path))
-            for path in discover_workflows(args.path)
+            analyze_workflow(parse_workflow_file(path)) for path in discover_workflows(args.path)
         )
         base = args.path.resolve() if args.path.is_dir() else args.path.resolve().parent
         report = _render(args.format, analyses, base)
@@ -52,9 +51,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
 
     errors = any(
-        finding.severity is Severity.ERROR
-        for analysis in analyses
-        for finding in analysis.findings
+        finding.severity is Severity.ERROR for analysis in analyses for finding in analysis.findings
     )
     warnings = any(
         finding.severity is Severity.WARNING

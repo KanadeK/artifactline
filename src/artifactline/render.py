@@ -88,9 +88,7 @@ def render_json(analyses: tuple[Analysis, ...], base: Path) -> str:
 
 def render_sarif(analyses: tuple[Analysis, ...], base: Path) -> str:
     results = [
-        _sarif_result(finding, base)
-        for analysis in analyses
-        for finding in analysis.findings
+        _sarif_result(finding, base) for analysis in analyses for finding in analysis.findings
     ]
     report = {
         "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
@@ -187,9 +185,7 @@ def _sarif_location(location: SourceLocation, base: Path) -> dict[str, Any]:
 
 
 def _summary(analyses: tuple[Analysis, ...]) -> dict[str, int]:
-    findings = tuple(
-        finding for analysis in analyses for finding in analysis.findings
-    )
+    findings = tuple(finding for analysis in analyses for finding in analysis.findings)
     return {
         "workflows": len(analyses),
         "errors": sum(finding.severity is Severity.ERROR for finding in findings),
