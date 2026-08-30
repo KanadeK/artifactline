@@ -1,9 +1,16 @@
 from __future__ import annotations
 
 import json
+import runpy
+import sys
 from pathlib import Path
 
+import pytest
+
+from artifactline.analyze import analyze_workflow
 from artifactline.cli import main
+from artifactline.parser import parse_workflow_file
+from artifactline.render import render_json
 
 
 def write_workflow(path: Path, body: str) -> Path:
@@ -161,3 +168,34 @@ def test_terminal_escapes_control_characters(tmp_path: Path, capsys) -> None:  #
     output = capsys.readouterr().out
     assert "\x1b" not in output
     assert "\\x1b[31m" in output
+
+
+def test_output_failures_exit_two(tmp_path: Path, capsys) -> None:  # type: ignore[no-untyped-def]
+    workflow = write_workflow(tmp_path / "ci.yml", HEALTHY)
+
+    missing_parent = tmp_path / "missing" / "report.json"
+    assert main(["audit", str(workflow), "--output", str(missing_parent)]) == 2
+    assert "output directory does not exist" in capsys.readouterr().err
+
+    assert main(["audit", str(workflow), "--output", str(tmp_path)]) == 2
+    assert "cannot write report" in capsys.readouterr().err
+
+
+def test_report_keeps_absolute_path_when_base_is_unrelated(tmp_path: Path) -> None:
+    workflow = write_workflow(tmp_path / "ci.yml", HEALTHY)
+    analysis = analyze_workflow(parse_workflow_file(workflow))
+
+    report = json.loads(render_json((analysis,), tmp_path / "elsewhere"))
+
+    assert report["workflows"][0]["path"] == workflow.resolve().as_posix()
+
+
+def test_python_module_entrypoint_returns_cli_status(tmp_path: Path, capsys, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    workflow = write_workflow(tmp_path / "ci.yml", HEALTHY)
+    monkeypatch.setattr(sys, "argv", ["artifactline", "audit", str(workflow)])
+
+    with pytest.raises(SystemExit) as exit_info:
+        runpy.run_module("artifactline", run_name="__main__")
+
+    assert exit_info.value.code == 0
+    assert "Summary: 0 errors" in capsys.readouterr().out

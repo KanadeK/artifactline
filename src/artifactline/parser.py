@@ -38,7 +38,7 @@ GitHubLoader.add_implicit_resolver(
     list("tTfF"),
 )
 
-_USES_LINE = re.compile(r"^\s*-\s*uses:\s*['\"]?([^'\"\s#]+)", re.MULTILINE)
+_USES_LINE = re.compile(r"^\s*(?:-\s*)?uses:\s*['\"]?([^'\"\s#]+)", re.MULTILINE)
 _UPLOAD_ACTION = re.compile(r"^actions/upload-artifact@", re.IGNORECASE)
 _DOWNLOAD_ACTION = re.compile(r"^actions/download-artifact@", re.IGNORECASE)
 
@@ -96,8 +96,6 @@ def parse_workflow_file(path: Path) -> Workflow:
     action_lines = _action_line_queues(text)
     jobs: list[Job] = []
     for job_id_value, job_value in jobs_data.items():
-        if not isinstance(job_id_value, str):
-            raise InputError("job identifiers must be strings")
         jobs.append(_parse_job(resolved, job_id_value, job_value, action_lines))
     return Workflow(path=resolved, jobs=tuple(jobs))
 
