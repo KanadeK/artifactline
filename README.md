@@ -124,6 +124,9 @@ The executable contract is in [`SPEC.md`](SPEC.md). Artifactline is an alpha:
 warnings describe uncertainty or policy risk; absence of a finding is not proof
 that a workflow is safe or that its generated paths exist at runtime.
 
+Contributions follow [`CONTRIBUTING.md`](CONTRIBUTING.md). Please report
+vulnerabilities privately as described in [`SECURITY.md`](SECURITY.md).
+
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
