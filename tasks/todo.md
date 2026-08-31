@@ -45,6 +45,6 @@
 ## Task 7: Publish and notify
 
 - [x] Review all changes across correctness, simplicity, architecture, security, and performance.
-- [ ] Create public repository, push `main`, wait for CI, tag `v0.1.0`, and verify non-draft Release assets.
-- [ ] Download the public wheel, install in a fresh environment, run healthy/broken smoke tests, and verify contributors.
-- [ ] Send the owner a Gmail completion notice with repository, release, verification, and failure-repair commands.
+- [x] Create public repository, push `main`, wait for CI, tag `v0.1.0`, and verify non-draft Release assets.
+- [x] Download the public wheel, install in a fresh environment, run healthy/broken smoke tests, and verify contributors.
+- [x] Send the owner a Gmail completion notice with repository, release, verification, and failure-repair commands.
